@@ -1,6 +1,39 @@
 defmodule HLDSRcon.Stats do
+  @moduledoc """
+  A struct representing the results of a stats call on a HLDS server.
+
+  ```
+  %HLDSRcon.Stats{
+    cpu: 10.00,
+    in: 1.00,
+    out: 1.00,
+    uptime: 1,
+    users: 1,
+    fps: 1000.0,
+    players: 32
+  }
+  ```
+  """
   defstruct cpu: nil, fps: nil, in: nil, out: nil, players: nil, uptime: nil, users: nil
 
+  @doc """
+  Constructs a `%HLDSRcon.Stats{}` struct from a list of string values
+
+  Expects a list matching;
+
+  ```
+  [
+    value_cpu,
+    value_in,
+    value_out,
+    value_up,
+    value_users,
+    value_fps,
+    value_players
+  ]
+  ```
+  """
+  @spec from(list()) :: struct()
   def from(
         [
           value_cpu,

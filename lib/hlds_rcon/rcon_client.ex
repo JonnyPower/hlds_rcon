@@ -1,11 +1,19 @@
 defmodule HLDSRcon.RconClient do
+  @moduledoc """
+  A `GenServer` for creating and using a HLDS rcon connection.
+
+  You should only call this module directly if you want to manage the suprvision of these GenServers yourself, otherwise
+  `HLDSRcon` probably covers your needs.
+
+  Call `start_link/2` with a `HLDSRcon.ServerInfo`
+  """
   use GenServer
 
   alias HLDSRcon.ServerInfo
 
   @message_start "\xff\xff\xff\xff"
   @message_end "\n"
-  @default_timeout 60000
+  @default_timeout 60000 # 60 Seconds
 
   # Client
 
@@ -41,8 +49,20 @@ defmodule HLDSRcon.RconClient do
     )
   end
 
+  def disconnect(host) do
+    disconnect(host, ServerInfo.default_port)
+  end
+
+  def disconnect(host, port) do
+    GenServer.call(
+      {:global, get_global_name(host, port)},
+      :disconnect
+    )
+  end
+
   # Server
 
+  @doc false
   def init({%ServerInfo{} = server, opts}) do
     {:ok, socket} = :gen_udp.open(0, [:binary, active: false])
     {
@@ -55,6 +75,15 @@ defmodule HLDSRcon.RconClient do
     }
   end
 
+  @doc false
+  def handle_call(:disconnect, _from, %{
+    socket: socket
+  } = state) do
+    :ok = :gen_udp.close(socket)
+    {:stop, :normal, :ok, state}
+  end
+
+  @doc false
   def handle_call({:command, command}, _from, %{
     server: server,
     socket: socket,
@@ -65,6 +94,7 @@ defmodule HLDSRcon.RconClient do
     {:reply, {:ok, result}, state}
   end
 
+  @doc false
   defp handle_command(socket, server, challenge, "stats", opts) do
     [_col_headers | [values | _]] = send_command(socket, server, challenge, "stats", opts)
     |> String.replace(~r/ +/, " ", global: true)
@@ -76,10 +106,12 @@ defmodule HLDSRcon.RconClient do
     |> HLDSRcon.Stats.from
   end
 
+  @doc false
   defp handle_command(socket, server, challenge, command, opts) do
     send_command(socket, server, challenge, command, opts)
   end
 
+  @doc false
   defp send_command(socket, %ServerInfo{
     host: host,
     port: port,
@@ -91,11 +123,10 @@ defmodule HLDSRcon.RconClient do
 
     timeout = Keyword.get(opts, :timeout, @default_timeout)
     {:ok, {_address, _port, @message_start <> data}} = :gen_udp.recv(socket, 0, timeout)
-    processed_response = data |> String.slice(5..-3)
-    IO.puts(processed_response)
-    processed_response
+    data |> String.slice(5..-3)
   end
 
+  @doc false
   defp get_challenge(socket, %ServerInfo{
     host: host,
     port: port
@@ -110,6 +141,7 @@ defmodule HLDSRcon.RconClient do
     challenge
   end
 
+  @doc false
   defp get_global_name(%ServerInfo{
     host: host,
     port: port
