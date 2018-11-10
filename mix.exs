@@ -21,7 +21,7 @@ defmodule HLDSRcon.MixProject do
   end
 
   def description do
-    "A elixir library for creating Half-Life Dedicated Server (a.k.a "HLDS") remote connections (a.k.a "rcon") and executing commands."
+    "A elixir library for creating Half-Life Dedicated Server (a.k.a \"HLDS\") remote connections (a.k.a \"rcon\") and executing commands."
   end
 
   # Run "mix help compile.app" to learn about applications.
