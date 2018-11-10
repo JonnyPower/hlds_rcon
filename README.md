@@ -48,7 +48,7 @@ end
     }}
 
 
-#Documentation
+## Documentation
 
 HexDocs at [https://hexdocs.pm/hlds_rcon](https://hexdocs.pm/hlds_rcon).
 
