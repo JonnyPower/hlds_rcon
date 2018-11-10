@@ -15,8 +15,7 @@ defmodule HLDSRcon.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {HLDSRcon.Application, []},
-      env: [timeout: 60000]
+      mod: {HLDSRcon.Application, []}
     ]
   end
 
