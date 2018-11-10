@@ -5,6 +5,7 @@ defmodule HLDSRcon.RconClient do
 
   @message_start "\xff\xff\xff\xff"
   @message_end "\n"
+  @default_timeout 60000
 
   # Client
 
@@ -88,7 +89,7 @@ defmodule HLDSRcon.RconClient do
                    |> :binary.bin_to_list
     :ok = :gen_udp.send(socket, host |> String.to_charlist, port, command_data)
 
-    timeout = Keyword.get(opts, :timeout, 60000)
+    timeout = Keyword.get(opts, :timeout, @default_timeout)
     {:ok, {_address, _port, @message_start <> data}} = :gen_udp.recv(socket, 0, timeout)
     processed_response = data |> String.slice(5..-3)
     IO.puts(processed_response)
@@ -103,7 +104,7 @@ defmodule HLDSRcon.RconClient do
                    |> :binary.bin_to_list
     :ok = :gen_udp.send(socket, host |> String.to_charlist, port, command_data)
 
-    timeout = Keyword.get(opts, :timeout, 60000)
+    timeout = Keyword.get(opts, :timeout, @default_timeout)
     {:ok, {_address, _port, @message_start <> data}} = :gen_udp.recv(socket, 0, timeout)
     [_ | [challenge | _]] = data |> String.slice(0..-3) |> String.split(" ")
     challenge
