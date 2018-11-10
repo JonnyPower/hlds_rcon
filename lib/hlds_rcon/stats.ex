@@ -4,9 +4,9 @@ defmodule HLDSRcon.Stats do
 
   ```
   %HLDSRcon.Stats{
-    cpu: 10.00,
-    in: 1.00,
-    out: 1.00,
+    cpu: 10.0,
+    in: 1.0,
+    out: 1.0,
     uptime: 1,
     users: 1,
     fps: 1000.0,
@@ -32,6 +32,30 @@ defmodule HLDSRcon.Stats do
     value_players
   ]
   ```
+
+  ## Example
+
+  ```
+  iex> HLDSRcon.Stats.from([
+  ...>   "10.0",
+  ...>   "1.0",
+  ...>   "1.0",
+  ...>   "1",
+  ...>   "1",
+  ...>   "1000.0",
+  ...>   "32"
+  ...> ])
+  %HLDSRcon.Stats{
+    cpu: 10.0,
+    in: 1.0,
+    out: 1.0,
+    uptime: 1,
+    users: 1,
+    fps: 1000.0,
+    players: 32
+  }
+  ```
+
   """
   @spec from(list()) :: struct()
   def from(

@@ -1,6 +1,6 @@
 defmodule HLDSRcon do
   @moduledoc """
-  A module for creating Half-Life Dedicated Server (a.k.a "HLDS") remote connections (a.k.a "rcon") and execting commands.
+  A module for creating Half-Life Dedicated Server (a.k.a "HLDS") remote connections (a.k.a "rcon") and executing commands.
 
   This module uses a `DynamicSupervisor` for connecting clients. If you want to manage the rcon client supervision
   yourself you can use the `HLDSRcon.RconClient` module directly.
@@ -29,17 +29,18 @@ defmodule HLDSRcon do
   we could simply call;
 
     ```
-    iex(1)> HLDSRcon.stats("127.0.0.1")
-    {:ok,
-    %HLDSRcon.Stats{
-     cpu: 11.33,
-     fps: 921.12,
-     in: 0.0,
-     out: 0.0,
-     players: 0,
-     uptime: 895,
-     users: 0
-    }}
+    {
+      :ok,
+      %HLDSRcon.Stats{
+       cpu: 11.33,
+       fps: 921.12,
+       in: 0.0,
+       out: 0.0,
+       players: 0,
+       uptime: 895,
+       users: 0
+      }
+    } = HLDSRcon.stats("127.0.0.1")
     ```
 
   """
