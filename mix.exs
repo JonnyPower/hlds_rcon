@@ -9,7 +9,8 @@ defmodule HLDSRcon.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
 
-      # Docs
+      description: description(),
+      package: package(),
       name: "HLDSRcon",
       source_url: "https://github.com/JonnyPower/hlds_rcon",
       docs: [
@@ -17,6 +18,10 @@ defmodule HLDSRcon.MixProject do
         extras: ["README.md"]
       ]
     ]
+  end
+
+  def description do
+    "A elixir library for creating Half-Life Dedicated Server (a.k.a "HLDS") remote connections (a.k.a "rcon") and executing commands."
   end
 
   # Run "mix help compile.app" to learn about applications.
@@ -31,6 +36,15 @@ defmodule HLDSRcon.MixProject do
   defp deps do
     [
       {:ex_doc, "~> 0.19", only: :dev, runtime: false}
+    ]
+  end
+
+  defp package do
+    [
+      licenses: ["MIT License"],
+      links: %{
+        "GitHub" => "https://github.com/JonnyPower/hlds_rcon"
+      }
     ]
   end
 end
