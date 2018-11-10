@@ -11,7 +11,7 @@ defmodule HLDSRcon.RconClient do
   end
 
   def init({%ServerInfo{} = server, opts}) do
-    {:ok, socket} = :gen_udp.open(0, [:binary, {:active, false}])
+    {:ok, socket} = :gen_udp.open(0, [:binary, active: false])
     {
       :ok,
       %{
