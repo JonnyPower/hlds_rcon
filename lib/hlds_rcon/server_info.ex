@@ -1,3 +1,6 @@
 defmodule HLDSRcon.ServerInfo do
-  defstruct host: "127.0.0.1", port: 27015, password: "foo"
+  @default_port 27015
+  def default_port, do: @default_port
+
+  defstruct host: "127.0.0.1", port: @default_port, password: "foo"
 end

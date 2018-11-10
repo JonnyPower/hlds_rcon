@@ -6,9 +6,41 @@ defmodule HLDSRcon.RconClient do
   @message_start "\xff\xff\xff\xff"
   @message_end "\n"
 
-  def init(%ServerInfo{} = server) do
-    init({server, []})
+  # Client
+
+  def start_link(%ServerInfo{} = server, opts \\ []) do
+    GenServer.start_link(
+      __MODULE__,
+      {server, opts},
+      name: {
+        :global, get_global_name(server)
+      }
+    )
   end
+
+  def stats(host) do
+    stats(host, ServerInfo.default_port)
+  end
+
+  def stats(host, port) do
+    GenServer.call(
+      {:global, get_global_name(host, port)},
+      {:command, "stats"}
+    )
+  end
+
+  def command(host, command) do
+    command(host, ServerInfo.default_port, command)
+  end
+
+  def command(host, port, command) when is_integer(port) do
+    GenServer.call(
+      {:global, get_global_name(host, port)},
+      {:command, command}
+    )
+  end
+
+  # Server
 
   def init({%ServerInfo{} = server, opts}) do
     {:ok, socket} = :gen_udp.open(0, [:binary, active: false])
@@ -36,27 +68,11 @@ defmodule HLDSRcon.RconClient do
     [_col_headers | [values | _]] = send_command(socket, server, challenge, "stats", opts)
     |> String.replace(~r/ +/, " ", global: true)
     |> String.split("\n")
-    [
-      value_cpu,
-      value_in,
-      value_out,
-      value_up,
-      value_users,
-      value_fps,
-      value_players
-    ] = values
-        |> String.split(" ")
-        |> Enum.map(&Float.parse/1)
-        |> Enum.map(fn {val, _} -> val end)
-    %HLDSRcon.Stats{
-      cpu: value_cpu,
-      in: value_in,
-      out: value_out,
-      uptime: value_up,
-      users: value_users,
-      fps: value_fps,
-      players: value_players
-    }
+
+    values
+    |> String.split(" ")
+    |> Enum.filter(fn x -> x != "" end)
+    |> HLDSRcon.Stats.from
   end
 
   defp handle_command(socket, server, challenge, command, opts) do
@@ -74,7 +90,9 @@ defmodule HLDSRcon.RconClient do
 
     timeout = Keyword.get(opts, :timeout, 60000)
     {:ok, {_address, _port, @message_start <> data}} = :gen_udp.recv(socket, 0, timeout)
-    data |> String.slice(5..-3)
+    processed_response = data |> String.slice(5..-3)
+    IO.puts(processed_response)
+    processed_response
   end
 
   defp get_challenge(socket, %ServerInfo{
@@ -89,6 +107,17 @@ defmodule HLDSRcon.RconClient do
     {:ok, {_address, _port, @message_start <> data}} = :gen_udp.recv(socket, 0, timeout)
     [_ | [challenge | _]] = data |> String.slice(0..-3) |> String.split(" ")
     challenge
+  end
+
+  defp get_global_name(%ServerInfo{
+    host: host,
+    port: port
+  }) do
+    get_global_name(host, port)
+  end
+
+  defp get_global_name(host, port) do
+    host <> ":" <> Integer.to_string(port)
   end
 
 end
