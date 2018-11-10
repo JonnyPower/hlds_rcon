@@ -154,7 +154,12 @@ defmodule HLDSRcon do
   def disconnect(host, port) when is_integer(port) do
     case :global.whereis_name(host <> ":" <> Integer.to_string(port)) do
       :undefined -> {:error, :not_connected}
-      _pid -> RconClient.disconnect(host, port)
+      pid ->
+        RconClient.disconnect(host, port)
+        case DynamicSupervisor.stop(HLDSRcon.ClientSupervisor, pid) do
+          :ok -> {:ok, :normal}
+          error_tuple -> error_tuple
+        end
     end
   end
 
