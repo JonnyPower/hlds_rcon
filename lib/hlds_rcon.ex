@@ -1,8 +1,8 @@
 defmodule HLDSRcon do
   @moduledoc """
-  A module for creating Half-Life Dedicated Server (a.k.a "HLDS") remote connections (a.k.a "rcon") and executing commands.
+  A library for creating Half-Life Dedicated Server (a.k.a "HLDS") remote connections (a.k.a "rcon") and executing commands.
 
-  This module uses a `DynamicSupervisor` for connecting clients. If you want to manage the rcon client supervision
+  Uses a `DynamicSupervisor` for connecting clients. If you want to manage the rcon client supervision
   yourself you can use the `HLDSRcon.RconClient` module directly.
 
   ## Examples
@@ -25,7 +25,7 @@ defmodule HLDSRcon do
     {:ok, %HLDSRcon.Stats{} = stats} = HLDSRcon.command("127.0.0.1", "stats")
     ```
 
-  These common commands also have entry points in this class, e.g. instead of calling command to run stats as above,
+  These common commands also have entry points in this module, e.g. instead of calling command to run stats as above,
   we could simply call;
 
     ```

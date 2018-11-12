@@ -122,8 +122,20 @@ defmodule HLDSRcon.RconClient do
     :ok = :gen_udp.send(socket, host |> String.to_charlist, port, command_data)
 
     timeout = Keyword.get(opts, :timeout, @default_timeout)
-    {:ok, {_address, _port, @message_start <> data}} = :gen_udp.recv(socket, 0, timeout)
-    data |> String.slice(5..-3)
+    {
+      :ok,
+      {
+        _address,
+        _port,
+        # Command response is <<255, 255, 255, 255>> <> "l" <> response <> garbage
+        @message_start <> <<108>> <> data
+      }
+    } = :gen_udp.recv(socket, 0, timeout)
+
+    data
+    |> String.chunk(:printable)
+    |> Enum.filter(&String.valid?/1)
+    |> Enum.at(0)
   end
 
   @doc false
@@ -136,8 +148,15 @@ defmodule HLDSRcon.RconClient do
     :ok = :gen_udp.send(socket, host |> String.to_charlist, port, command_data)
 
     timeout = Keyword.get(opts, :timeout, @default_timeout)
-    {:ok, {_address, _port, @message_start <> data}} = :gen_udp.recv(socket, 0, timeout)
-    [_ | [challenge | _]] = data |> String.slice(0..-3) |> String.split(" ")
+    {
+      :ok,
+      {
+        _address,
+        _port,
+        # Challenge response is <<255, 255, 255, 255>> <> "A12345678 1234567890 0\n\0"
+        @message_start <> "A" <> <<_challenge_number::bytes-size(8)>> <> " " <> <<challenge::bytes-size(10)>> <> _suffix
+      }
+    } = :gen_udp.recv(socket, 0, timeout)
     challenge
   end
 
